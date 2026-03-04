@@ -2,11 +2,29 @@
 
 ## Overview
 
-This directory contains experiment logs generated using the **SET scheduling framework**. The experiments investigate how different **neural network task granularities** interact with different **inter-layer scheduling strategies** on tiled accelerators.
+This directory contains experiment logs generated using the **SET scheduling framework**.
+All experiments are conducted on **Transformer neural network workloads**.
+
+The goal of these experiments is to investigate how different **task granularities of Transformer layers** interact with different **inter-layer scheduling strategies** on tiled accelerators.
+
+Each log records:
+
+* the scheduling tree structure
+* the scheduling scheme
+* performance statistics such as energy and latency
 
 ## 概述
 
-本目录存储使用 **SET 调度框架**运行实验产生的日志。实验研究 **不同神经网络任务粒度** 与 **不同层间调度策略** 在 tiled accelerator 上的相互影响。
+本目录存储使用 **SET 调度框架**运行实验产生的日志。
+所有实验均基于 **Transformer 神经网络模型**。
+
+这些实验主要研究 **Transformer 网络不同任务粒度** 与 **不同层间调度策略** 在 tiled accelerator 上的相互影响。
+
+每个日志记录：
+
+* 调度树结构
+* 调度方案
+* 性能指标（能耗、延迟等）
 
 ---
 
@@ -16,7 +34,7 @@ All experiments are built upon the SET framework proposed in the ISCA 2023 paper
 
 **SET: Inter-layer Scheduling Space Definition and Exploration for Tiled Accelerators**
 
-SET represents scheduling structures using a **Resource Allocation Tree (RA Tree)** and explores the inter-layer scheduling space automatically.
+SET represents scheduling structures using a **Resource Allocation Tree (RA Tree)** and automatically explores the inter-layer scheduling space.
 
 ## 框架
 
@@ -32,13 +50,13 @@ SET 使用 **资源分配树（RA Tree）** 表示调度结构，并自动探索
 
 Each log file follows the pattern:
 
-```
+```id="e6z2ew"
 <granularity>_<method>_<type>.txt
 ```
 
 Example:
 
-```
+```id="n70q63"
 base_LP_summary.txt
 grouped_SET_tree.txt
 fused_LS_scheme.txt
@@ -48,13 +66,13 @@ fused_LS_scheme.txt
 
 每个日志文件遵循如下命名格式：
 
-```
+```id="ug4qpj"
 <granularity>_<method>_<type>.txt
 ```
 
 示例：
 
-```
+```id="u9m2qk"
 base_LP_summary.txt
 grouped_SET_tree.txt
 fused_LS_scheme.txt
@@ -72,25 +90,25 @@ fused_LS_scheme.txt
 
 # Granularity Types
 
-The experiments evaluate multiple task granularities derived from the original neural network model.
+The experiments evaluate several task granularities derived from **Transformer workloads**.
 
 ## 任务粒度类型
 
-实验评估了多种基于原始神经网络模型设计的任务粒度。
+实验评估了多种基于 **Transformer 网络结构**设计的任务粒度。
 
 ---
 
 ## base
 
-The original neural network structure where each layer is scheduled independently.
+The original Transformer network structure where each layer is scheduled independently.
 
-This corresponds to the baseline configuration of the workload.
+Each Transformer operator (attention, feed-forward, element-wise operations, etc.) is treated as an independent scheduling unit.
 
 ## base（原始粒度）
 
-原始神经网络结构，每一层作为独立任务进行调度。
+原始 Transformer 网络结构，每一层作为独立任务进行调度。
 
-这是实验的基准配置。
+Transformer 中的每个算子（attention、feed-forward、element-wise 等）都是独立调度单元。
 
 ---
 
@@ -100,33 +118,33 @@ Layer fusion granularity.
 
 Multiple consecutive layers are merged into a single fused layer before scheduling.
 
-This transformation **changes the network structure** and reduces intermediate communication.
+This transformation **modifies the neural network structure** and reduces intermediate communication between layers.
 
 ## fused（层融合粒度）
 
 层融合粒度。
 
-多个连续神经网络层被融合为一个新的层再进行调度。
+多个连续的神经网络层在调度前被融合为一个新的层。
 
-这种方式 **改变了网络结构**，并减少中间数据通信。
+这种方式 **改变网络结构**，并减少层之间的中间数据通信。
 
 ---
 
 ## grouped
 
-Grouped granularity for Transformer models.
+Grouped granularity designed for Transformer attention structures.
 
-The **attention-related operations within a Transformer block are grouped together once**, forming a larger scheduling unit while keeping the original layers internally unchanged.
+The **attention-related components inside a Transformer block are grouped once**, forming a larger scheduling unit.
 
-This does not modify the neural network structure but changes the scheduling granularity.
+The original neural network structure remains unchanged internally.
 
 ## grouped（单次打包粒度）
 
-针对 Transformer 网络设计的打包策略。
+针对 Transformer attention 结构设计的打包粒度。
 
-**Transformer 中 attention 相关的计算在调度前进行一次打包**，形成更大的调度单元，但内部层结构保持不变。
+Transformer block 中 **attention 相关算子进行一次打包**，形成更大的调度单元。
 
-这种方式 **不改变网络结构，只改变调度粒度**。
+神经网络内部结构保持不变。
 
 ---
 
@@ -134,9 +152,9 @@ This does not modify the neural network structure but changes the scheduling gra
 
 Semi-grouped granularity.
 
-The attention components are **grouped twice**, forming a larger scheduling unit compared with `grouped`.
+The attention-related components are **grouped twice**, forming larger scheduling units compared with `grouped`.
 
-This results in a granularity between `base` and `grouped`.
+This provides an intermediate granularity between `base` and `grouped`.
 
 ## semigrouped（双次打包粒度）
 
@@ -144,7 +162,7 @@ This results in a granularity between `base` and `grouped`.
 
 Transformer 的 attention 相关部分 **进行两次打包**，形成比 `grouped` 更大的调度单元。
 
-该粒度介于 **base 与 grouped 之间**。
+这种粒度介于 **base 与 grouped 之间**。
 
 ---
 
@@ -160,15 +178,11 @@ Different inter-layer scheduling strategies are evaluated.
 
 ## init
 
-Initial scheduling configuration.
-
-This corresponds to the original scheduling tree before optimization.
+Initial scheduling configuration before optimization.
 
 ## init
 
-初始调度配置。
-
-表示优化前的原始调度树结构。
+优化前的初始调度结构。
 
 ---
 
@@ -176,13 +190,13 @@ This corresponds to the original scheduling tree before optimization.
 
 Layer Sequential scheduling.
 
-Layers are executed sequentially and all hardware resources are allocated to one layer at a time.
+Transformer layers are executed sequentially and all hardware resources are allocated to a single layer at a time.
 
 ## LS
 
 层顺序执行（Layer Sequential）。
 
-一次只执行一层，所有硬件资源集中用于当前层。
+Transformer 各层顺序执行，一次只运行一层。
 
 ---
 
@@ -190,27 +204,27 @@ Layers are executed sequentially and all hardware resources are allocated to one
 
 Layer Pipeline scheduling.
 
-Different layers are executed concurrently in a pipeline across hardware partitions.
+Different Transformer layers execute concurrently in a pipeline across hardware partitions.
 
 ## LP
 
 层流水执行（Layer Pipeline）。
 
-不同层在不同硬件分区上并行执行，形成流水线。
+不同 Transformer 层在不同硬件分区上并行执行，形成流水线。
 
 ---
 
 ## SET
 
-Scheduling result generated by the SET exploration algorithm.
+Scheduling result generated by the SET scheduling exploration algorithm.
 
-SET automatically searches the inter-layer scheduling space using the RA Tree representation.
+SET automatically searches the inter-layer scheduling space using RA Trees.
 
 ## SET
 
 SET 自动探索算法生成的调度结果。
 
-SET 使用 RA Tree 表示调度结构并搜索层间调度空间。
+SET 使用 RA Tree 搜索层间调度空间。
 
 ---
 
@@ -220,7 +234,7 @@ Each experiment generates three types of logs.
 
 ## 日志类型
 
-每个实验会生成三种日志文件。
+每个实验生成三类日志。
 
 ---
 
@@ -228,7 +242,7 @@ Each experiment generates three types of logs.
 
 Example:
 
-```
+```id="lhpq83"
 base_SET_tree.txt
 ```
 
@@ -238,7 +252,7 @@ This file records the **Resource Allocation Tree (RA Tree)** representing the sc
 
 示例：
 
-```
+```id="0tavb0"
 base_SET_tree.txt
 ```
 
@@ -250,21 +264,21 @@ base_SET_tree.txt
 
 Example:
 
-```
+```id="yrhmy3"
 base_SET_scheme.txt
 ```
 
-This file contains the detailed scheduling scheme including task allocation and execution configuration.
+This file records the detailed scheduling scheme including resource allocation and execution configuration.
 
 ## scheme 文件
 
 示例：
 
-```
+```id="c96ypq"
 base_SET_scheme.txt
 ```
 
-该文件记录详细的调度方案，包括任务分配与执行配置。
+该文件记录详细调度方案，包括资源分配与执行配置。
 
 ---
 
@@ -272,7 +286,7 @@ base_SET_scheme.txt
 
 Example:
 
-```
+```id="uz6cfa"
 base_SET_summary.txt
 ```
 
@@ -282,11 +296,11 @@ This file reports the overall performance statistics of the experiment.
 
 示例：
 
-```
+```id="0pvd5h"
 base_SET_summary.txt
 ```
 
-该文件记录实验的整体性能指标。
+该文件记录实验整体性能指标。
 
 Typical metrics include:
 
@@ -302,7 +316,7 @@ Typical metrics include:
 
 Example:
 
-```
+```id="lb1vru"
 Energy: 5.02481e+11
 Latency: 257634112
 Cost Function: 1.29456e+20
