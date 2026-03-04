@@ -1,0 +1,13 @@
+[Cost Summary]
+Energy: 9.99727e+11
+Latency: 284356416
+Cost Function: 2.84279e+20
+
+[Detailed Cost]
+ubuf_energy: 3.9985e+10
+buf_energy: 1.86512e+11
+bus_energy: 0
+mac_energy: 9.64365e+10
+noc_energy: 3.05866e+11
+DRAM_energy: 3.70928e+11
+NoC & DRAM latency bound: 96595776
